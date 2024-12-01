@@ -3,3 +3,44 @@ title: "Modeling"
 format: html
 editor: visual
 ---
+
+```{r}
+library(tidymodels)
+library(tidyverse)
+library(rpart)
+library(baguette)
+
+set.seed(1234)
+
+split_data<-initial_split(data,prop=0.7)
+train_data<-training(split_data)
+test_data<-testing(split_data)
+cv_fold_data<-vfold_cv(train_data,5)
+
+
+
+
+rec1<-recipe(Diabetes_binary~Sex+Smoker+BMI+GenHlth+PhysHlth,data=train_data)|>
+   step_dummy(Sex,Smoker,GenHlth,PhysHlth)|>
+  step_normalize(all_numeric())
+
+rec1|>
+  prep(train_data)|>
+  bake(train_data)
+
+rf_spec<-rand_forest(mtry=2)|>
+  set_engine("ranger")|>
+  set_mode("classification")
+
+rf_wkf<-workflow()|>
+  add_recipe(rec1)|>
+  add_model(rf_spec)
+
+rf_fit<-rf_wkf|>
+  tune_grid(resamples=cv_fold_data,
+            grid=5,
+            metrics=metric_set(mn_log_loss))
+
+
+```
+
