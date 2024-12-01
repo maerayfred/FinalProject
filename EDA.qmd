@@ -13,15 +13,14 @@ library(tidyr)
 data<-read.csv("diabetes_binary_health_indicators_BRFSS2015.csv")
 
 data<- data|>
-  mutate(HighBP=as.factor(HighBP),
-         HighChol=as.factor(HighChol),
+  mutate(HighBP=factor(HighBP, levels=c(0,1),labels=c("Normal BP","High BP")),
+         HighChol=factor(HighChol, levels=c(0,1),labels=c("Normal Chol","High Chol")),
          CholCheck=as.factor(CholCheck),
-         Smoker=as.factor(Smoker),
-         Stroke=as.factor(Stroke),
-         PhysActivity=as.factor(PhysActivity),
-         Fruits=as.factor(Fruits),
-         Veggies=as.factor(Veggies),
-         Sex=as.factor(Sex),
+         Smoker=factor(Smoker,levels=c(0,1),labels=c("Non-Smoker","Smoker")),
+         Stroke=factor(Stroke, levels=c(0,1),labels=c("No Stroke","Yes Stroke")),
+         Fruits=factor(Fruits,levels=c(0,1),labels=c("No Fruits","Eats Fruits")),
+         Veggies=factor(Veggies,levels=c(0,1),labels=c("No Veggies","Eats Veggies")),
+         Sex=factor(Sex, level=c(0,1), labels = c("Female","Male")),
          GenHlth=factor(GenHlth,levels=c(1,2,3,4,5), 
                         labels=c("Excellent","Very Good","Good","Fair","Poor")),
          Age=factor(Age, levels=c(1,2,3,4,5,6,7,8,9,10,11,12,13),
@@ -29,16 +28,16 @@ data<- data|>
                             "60-64","65-69","70-74","75-79","80+" )),
          Education=factor(Education,levels=c(1,2,3,4,5,6),labels=c("None-K","Grades 1-8",
                                                                    "Grades 9-11","HS Diploma","Some College","Bachelor's Degree or Higher")),
-         Income=factor(Income,levels=c(1,2,3,4,5,6,7,8),labels=c("<10,000","10,000-<15,000",
-          "15,000-<20,000","20,000-<25,000","25,000-<35,000","35,000-<50,000",
-          "50,000-<75,000",">=75,000")),
-         Diabetes_binary=factor(Diabetes_binary),
-         HeartDiseaseorAttack=factor(HeartDiseaseorAttack),
-         PhysActivity=factor(PhysActivity),
-         HvyAlcoholConsump=factor(HvyAlcoholConsump),
-         AnyHealthcare=factor(AnyHealthcare),
-         NoDocbcCost=factor(NoDocbcCost),
-         DiffWalk=factor(DiffWalk)
+         Income=factor(Income,levels=c(1,2,3,4,5,6,7,8),labels=c("<10K","<15K",
+          "<20K","<25K","<35K","<50K",
+          "<75K",">=75K")),
+         Diabetes_binary=factor(Diabetes_binary,levels=c(0,1),labels=c("Not Diabetic","Diabetic")),
+         HeartDiseaseorAttack=factor(HeartDiseaseorAttack,levels=c(0,1),labels=c("No Heart Disease","Heart Disease")),
+         PhysActivity=factor(PhysActivity,levels=c(0,1),labels=c("No Physical Activity","Physical Activity")),
+         HvyAlcoholConsump=factor(HvyAlcoholConsump,levels=c(0,1),labels=c("Not Heavy Drinker","Heavy Drinker")),
+         AnyHealthcare=factor(AnyHealthcare,levels=c(0,1),labels=c("No Health Coverage","Yes Health Coverage")),
+         NoDocbcCost=factor(NoDocbcCost,levels=c(0,1),labels=c("Cost is an Issue","Cost Not an Issue")),
+         DiffWalk=factor(DiffWalk,levels=c(0,1),labels=c("No Difficulty Walking","Difficulty Walking"))
          )
 
 str(data)
@@ -54,14 +53,62 @@ sum_na<-function(column){
 na_counts<-data|>
   summarize(across(everything(),sum_na))
 
-na_counts
+print(na_counts)
 
 
 summaries<- data|>
   summarize(across(where(is.numeric),
                    list("mean"=mean,
-                         "median"=median),
+                         "median"=median,
+                          "min"=min,
+                          "max"=max,
+                           "sd"=sd,
+                           "iqr"=IQR),
                     .names="{.fn}_{.col}"))
+print(summaries)
+
 ```
 
+
+```{r}
+table(data$Sex,data$Diabetes_binary)
+
+table(data$Sex,data$Diabetes_binary,data$Age)
+
+table(data$Education,data$HighBP)
+
+table(data$Education,data$HighChol)
+
+table(data$Income)
+
+data2<-data|>
+  filter( Income != ">=75K" )
+
+table(data2$Fruits,data2$Veggies,data2$Diabetes_binary)
+
+```
+
+
+```{r}
+ggplot(data=data,aes(x=Sex,fill=Diabetes_binary))+
+  geom_bar(position="fill")+
+  labs(x="Sex")+
+  scale_fill_discrete("Diabetes Status")
+
+
+
+ggplot(data=data|>group_by(Income),aes(x=Income,fill=Diabetes_binary))+
+  geom_bar(position="fill")+
+  labs(x="Income")+
+  scale_fill_discrete("Diabetes Status")
+```
+
+```{r}
+# Create a grouped boxplot using ggplot2
+ggplot(data = data, aes(x = Education, y = BMI,
+                        fill = factor(Income))) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(fill = "Income")
+```
 
