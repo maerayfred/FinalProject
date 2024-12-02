@@ -29,7 +29,7 @@ library(ranger)
 
 set.seed(1234)
 
-split_data<-initial_split(data,prop=0.9,strata = Diabetes_binary)
+split_data<-initial_split(data,prop=0.1,strata = Diabetes_binary)
 train_data<-training(split_data)
 test_data<-testing(split_data)
 cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
@@ -53,7 +53,7 @@ rf_wkf<-workflow()|>
 
 rf_fit<-rf_wkf|>
   tune_grid(resamples=cv_fold_data,
-            grid=5,
+            grid=1,
             metrics=metric_set(mn_log_loss))
 
 
