@@ -9,26 +9,41 @@ library(tidymodels)
 library(tidyverse)
 library(rpart)
 library(baguette)
+library(parsnip)
+library(tidyr)
+library(dplyr)
+library(readr)
+library(lubridate)
+library(psych)
+library(tidymodels)
+library(stats)
+library(rsample)
+library(yardstick)
+library(tidyverse)
+library(corrr)
+library(parsnip)
+library(tune)
+library(glmnet)
+library(baguette)
+library(ranger)
 
 set.seed(1234)
 
-split_data<-initial_split(data,prop=0.7)
+split_data<-initial_split(data,prop=0.9,strata = Diabetes_binary)
 train_data<-training(split_data)
 test_data<-testing(split_data)
-cv_fold_data<-vfold_cv(train_data,5)
+cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
 
 
 
 
-rec1<-recipe(Diabetes_binary~Sex+Smoker+BMI+GenHlth+PhysHlth,data=train_data)|>
-   step_dummy(Sex,Smoker,GenHlth,PhysHlth)|>
+
+rec1<-recipe(Diabetes_binary~ Sex+Smoker+BMI+GenHlth+PhysHlth,data=train_data)|>
+   step_dummy(Sex,Smoker,GenHlth)|>
   step_normalize(all_numeric())
 
-rec1|>
-  prep(train_data)|>
-  bake(train_data)
 
-rf_spec<-rand_forest(mtry=2)|>
+rf_spec<-rand_forest(mtry=tune())|>
   set_engine("ranger")|>
   set_mode("classification")
 
