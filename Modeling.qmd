@@ -140,3 +140,11 @@ tree_final_model %>%
 
 ```
 
+
+```{r}
+best<-rf_wkf|>
+  finalize_workflow(rf_best_params)|>
+  fit(data)
+best
+```
+
