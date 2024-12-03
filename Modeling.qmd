@@ -26,6 +26,7 @@ library(tune)
 library(glmnet)
 library(baguette)
 library(ranger)
+library(rpart.plot)
 
 set.seed(1234)
 
@@ -53,8 +54,81 @@ rf_wkf<-workflow()|>
 
 rf_fit<-rf_wkf|>
   tune_grid(resamples=cv_fold_data,
-            grid=1,
+            grid=2,
             metrics=metric_set(mn_log_loss))
+
+rf_fit|>
+  collect_metrics()|>
+  filter(.metric=="mn_log_loss")|>
+  arrange(mean)
+
+rf_best_params<-select_best(rf_fit,metric = "mn_log_loss")
+rf_best_params
+
+
+rf_final_wkf<-rf_wkf|>
+  finalize_workflow(rf_best_params)
+
+rf_final_fit<-rf_final_wkf|>
+  last_fit(split_data,metrics=metric_set(mn_log_loss))
+
+
+```
+
+
+
+
+```{r}
+tree_mod<-decision_tree(tree_depth = tune(),
+                        min_n = 3,
+                        cost_complexity = tune()
+                        )|>
+  set_engine("rpart")|>
+  set_mode("classification")
+
+tree_wkf<-workflow()|>
+  add_recipe(rec1)|>
+  add_model(tree_mod)
+
+temp<-tree_wkf|>
+  tune_grid(resamples = cv_fold_data)
+  temp|>
+    collect_metrics()
+  
+  tree_grid<-grid_regular(cost_complexity(),
+                          tree_depth(),
+                          levels=c(5,3))
+  tree_fits<-tree_wkf|>
+    tune_grid(resamples=cv_fold_data,
+              grid=tree_grid)
+  
+  tree_fits
+  
+  tree_fits|>
+    collect_metrics()|>
+    filter(.metric=="accuracy")|>
+    arrange(mean)
+  
+tree_best_params<-select_best(tree_fits, metric="accuracy")
+tree_best_params
+
+tree_final_wkf<-tree_wkf|>
+  finalize_workflow(tree_best_params)
+
+tree_final_fit<-tree_final_wkf|>
+  last_fit(split_data)
+tree_final_fit
+
+tree_final_fit|>
+  collect_metrics()
+
+tree_final_model<-extract_workflow(tree_final_fit)
+tree_final_model
+
+tree_final_model %>%
+  extract_fit_engine () %>%
+  rpart.plot::rpart.plot(roundint=FALSE)
+
 
 
 ```
