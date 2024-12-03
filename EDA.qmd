@@ -33,11 +33,11 @@ data<- data|>
           "<75K",">=75K")),
          Diabetes_binary=factor(Diabetes_binary,levels=c(0,1),labels=c("Not_Diabetic","Diabetic")),
          HeartDiseaseorAttack=factor(HeartDiseaseorAttack,levels=c(0,1),labels=c("No_Heart Disease","Heart_Disease")),
-         PhysActivity=factor(PhysActivity,levels=c(0,1),labels=c("No Physical Activity","Physical Activity")),
-         HvyAlcoholConsump=factor(HvyAlcoholConsump,levels=c(0,1),labels=c("Not Heavy Drinker","Heavy Drinker")),
-         AnyHealthcare=factor(AnyHealthcare,levels=c(0,1),labels=c("No Health Coverage","Yes Health Coverage")),
-         NoDocbcCost=factor(NoDocbcCost,levels=c(0,1),labels=c("Cost is an Issue","Cost Not an Issue")),
-         DiffWalk=factor(DiffWalk,levels=c(0,1),labels=c("No Difficulty Walking","Difficulty Walking"))
+         PhysActivity=factor(PhysActivity,levels=c(0,1),labels=c("No_Physical Activity","Physical_Activity")),
+         HvyAlcoholConsump=factor(HvyAlcoholConsump,levels=c(0,1),labels=c("Not_Heavy Drinker","Heavy_Drinker")),
+         AnyHealthcare=factor(AnyHealthcare,levels=c(0,1),labels=c("No_Health_Coverage","Yes_Health_Coverage")),
+         NoDocbcCost=factor(NoDocbcCost,levels=c(0,1),labels=c("Cost_Issue","Cost_Not_Issue")),
+         DiffWalk=factor(DiffWalk,levels=c(0,1),labels=c("No_Difficulty_Walking","Difficulty_Walking"))
          )
 
 str(data)

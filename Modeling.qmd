@@ -4,6 +4,7 @@ format: html
 editor: visual
 ---
 
+## Basic R Modeling
 ```{r}
 library(tidymodels)
 library(tidyverse)
@@ -39,9 +40,9 @@ cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
 
 
 
-rec1<-recipe(Diabetes_binary~ Sex+Smoker+BMI+GenHlth+PhysHlth,data=train_data)|>
-   step_dummy(Sex,Smoker,GenHlth)|>
-  step_normalize(all_numeric())
+rec1<-recipe(Diabetes_binary~ Sex+Smoker+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
+   step_dummy(Sex,Smoker,GenHlth,AnyHealthcare,PhysActivity)
+
 
 
 rf_spec<-rand_forest(mtry=tune())|>
@@ -62,6 +63,7 @@ rf_fit|>
   filter(.metric=="mn_log_loss")|>
   arrange(mean)
 
+
 rf_best_params<-select_best(rf_fit,metric = "mn_log_loss")
 rf_best_params
 
@@ -72,15 +74,17 @@ rf_final_wkf<-rf_wkf|>
 rf_final_fit<-rf_final_wkf|>
   last_fit(split_data,metrics=metric_set(mn_log_loss))
 
+rf_final_fit|>collect_metrics()
+
 
 ```
 
 
 
-
+## Classification Tree
 ```{r}
 tree_mod<-decision_tree(tree_depth = tune(),
-                        min_n = 3,
+                        min_n = 5,
                         cost_complexity = tune()
                         )|>
   set_engine("rpart")|>
@@ -91,32 +95,35 @@ tree_wkf<-workflow()|>
   add_model(tree_mod)
 
 temp<-tree_wkf|>
-  tune_grid(resamples = cv_fold_data)
+  tune_grid(resamples = cv_fold_data,metrics = metric_set(mn_log_loss))
   temp|>
     collect_metrics()
+
+  
   
   tree_grid<-grid_regular(cost_complexity(),
                           tree_depth(),
                           levels=c(5,3))
   tree_fits<-tree_wkf|>
-    tune_grid(resamples=cv_fold_data,
+    tune_grid(resamples=cv_fold_data,metrics=metric_set(mn_log_loss),
               grid=tree_grid)
   
   tree_fits
   
   tree_fits|>
     collect_metrics()|>
-    filter(.metric=="accuracy")|>
+    filter(.metric=="mn_log_loss")|>
     arrange(mean)
+
   
-tree_best_params<-select_best(tree_fits, metric="accuracy")
+tree_best_params<-select_best(tree_fits, metric="mn_log_loss")
 tree_best_params
 
 tree_final_wkf<-tree_wkf|>
   finalize_workflow(tree_best_params)
 
 tree_final_fit<-tree_final_wkf|>
-  last_fit(split_data)
+  last_fit(split_data,metrics=metric_set(mn_log_loss))
 tree_final_fit
 
 tree_final_fit|>
