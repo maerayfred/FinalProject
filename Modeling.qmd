@@ -28,6 +28,8 @@ library(glmnet)
 library(baguette)
 library(ranger)
 library(rpart.plot)
+library(caret)
+
 
 set.seed(1234)
 
@@ -55,7 +57,7 @@ rf_wkf<-workflow()|>
 
 rf_fit<-rf_wkf|>
   tune_grid(resamples=cv_fold_data,
-            grid=2,
+            grid=3,
             metrics=metric_set(mn_log_loss))
 
 rf_fit|>
@@ -139,7 +141,7 @@ tree_final_model %>%
 
 
 ```
-
+## Final and Best Model
 
 ```{r}
 best<-rf_wkf|>
