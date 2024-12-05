@@ -111,4 +111,10 @@ ggplot(data = data, aes(x = Education, y = BMI,
   theme_minimal() +
   labs(fill = "Income")
 ```
+## Click here for the modeling page
+
+
+## Navigation
+
+Navigate to the [Modeling Page](modeling.html) for more details about the modeling process.
 

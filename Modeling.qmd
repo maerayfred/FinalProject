@@ -79,15 +79,13 @@ cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
 ## Random Forest Model
 
 ```{r}
-
-
 rec1<-recipe(Diabetes_binary~ Sex+Smoker+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
    step_dummy(Sex,Smoker,GenHlth,AnyHealthcare,PhysActivity)
 
 
 
 rf_spec<-rand_forest(mtry=tune())|>
-  set_engine("ranger")|>
+  set_engine("ranger", importance = "impurity")|>
   set_mode("classification")
 
 rf_wkf<-workflow()|>
@@ -116,6 +114,15 @@ rf_final_fit<-rf_final_wkf|>
   last_fit(split_data,metrics=metric_set(mn_log_loss))
 
 rf_final_fit|>collect_metrics()
+
+rf_model <- extract_fit_parsnip(rf_final_fit)
+importance <- ranger::importance(rf_model$fit)
+coef_table <- tibble(
+  variable = names(importance),
+  importance = importance)|>
+  arrange(desc(importance))
+print(coef_table)
+
 
 ```
 
