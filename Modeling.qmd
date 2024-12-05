@@ -36,6 +36,7 @@ library(caret)
 ## Setting up Data
 
 ```{r}
+
 data<-read.csv("diabetes_binary_health_indicators_BRFSS2015.csv")
 
 data<- data|>
@@ -48,7 +49,7 @@ data<- data|>
          Veggies=factor(Veggies,levels=c(0,1),labels=c("No_Veggies","Eats_Veggies")),
          Sex=factor(Sex, level=c(0,1), labels = c("Female","Male")),
          GenHlth=factor(GenHlth,levels=c(1,2,3,4,5), 
-                        labels=c("Excellent","Very Good","Good","Fair","Poor")),
+                        labels=c("Excellent","Very_Good","Good","Fair","Poor")),
          Age=factor(Age, levels=c(1,2,3,4,5,6,7,8,9,10,11,12,13),
                     labels=c("18-24","25-29","30-34","35-39","40-44","45-49","50-54","55-59",
                             "60-64","65-69","70-74","75-79","80+" )),
@@ -79,6 +80,10 @@ cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
 ## Random Forest Model
 
 ```{r}
+data2<-data|>
+  select(Sex,Smoker,AnyHealthcare,GenHlth,PhysActivity)
+
+
 rec1<-recipe(Diabetes_binary~ Sex+Smoker+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
    step_dummy(Sex,Smoker,GenHlth,AnyHealthcare,PhysActivity)
 
@@ -92,9 +97,11 @@ rf_wkf<-workflow()|>
   add_recipe(rec1)|>
   add_model(rf_spec)
 
+mtry_vals <- grid_regular(mtry(range = c(1, ncol(data2) - 1)), levels = 5)
+
 rf_fit<-rf_wkf|>
   tune_grid(resamples=cv_fold_data,
-            grid=3,
+            grid=mtry_vals,
             metrics=metric_set(mn_log_loss))
 
 rf_fit|>
@@ -150,7 +157,7 @@ temp<-tree_wkf|>
   
   tree_grid<-grid_regular(cost_complexity(),
                           tree_depth(),
-                          levels=c(5,3))
+                          levels=c(5,5))
   tree_fits<-tree_wkf|>
     tune_grid(resamples=cv_fold_data,metrics=metric_set(mn_log_loss),
               grid=tree_grid)
@@ -191,8 +198,19 @@ tree_final_model %>%
 ```{r}
 best<-rf_wkf|>
   finalize_workflow(rf_best_params)|>
-  fit(data)
+  fit(train_data)
 best
+
+predictions <- predict(best, data)
+
+  class_table <- table(predictions)
+  
+  class_table
+
+  prevalent_class <- names(which.max(class_table))
+  
+  # Return the result as a JSON response
+  list(predicted_class = prevalent_class)
 ```
 
 

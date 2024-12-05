@@ -1,4 +1,5 @@
 
+
 library(plumber)
 library(caret)
 library(gridExtra)
@@ -95,7 +96,6 @@ matrix2<-conf_mat(data |> mutate(estimate = best |> predict(data) |> pull()) ,Di
 
 my_table<-tableGrob(matrix2$table)
 
-
 library(plumber)
 
 #* @apiTitle Final Project API
@@ -106,7 +106,7 @@ library(plumber)
 #* @get /info
 function(){
  list( "Name"="Maegan Frederick ",
-  "url"="https://github.com/maerayfred/FinalProject")
+  "url"="https://maerayfred.github.io/FinalProject/")
 }
 
 #* Plot a matrix
