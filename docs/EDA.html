@@ -133,6 +133,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="introduction-to-the-data-and-my-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-the-data-and-my-analysis">Introduction to the data and my Analysis</h2>
+<p>This data set,originally a CSV file, containing cleaned data from approximately 440,000 individuals. It includes 21 variables derived directly from respondents or calculated based on their responses. The data was collected through a phone survey focused on Behavioral Risk Factors.</p>
+<p>The primary goal of this data collection and subsequent analysis is to identify the most common predictors for determining whether an individual is more likely to report having diabetes. Key variables of interest include:</p>
+<p>-Sex (Gender): The respondent’s reported gender. -Veggies: Whether the respondent consumes vegetables one or more times per day. -AnyHealthcare: Whether the respondent has any form of health insurance coverage. -GenHealth: A self-reported health status on a scale from 1 (excellent) to 5 (poor). -PhysActivity: Whether the respondent engaged in physical activity (excluding work-related activity) within the past 30 days.</p>
+<p>The purpose of the exploratory data analysis (EDA) is to ensure the data is clean, prepare it for analysis (e.g., converting numeric responses into meaningful categories for better interpretation), and examine the prevalence of these potential risk factors.</p>
+</section>
 <section id="reading-in-data-and-converting-variables" class="level2">
 <h2 class="anchored" data-anchor-id="reading-in-data-and-converting-variables">Reading in Data and Converting Variables</h2>
 <div class="cell">
@@ -163,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">Veggies=</span><span class="fu">factor</span>(Veggies,<span class="at">levels=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">labels=</span><span class="fu">c</span>(<span class="st">"No_Veggies"</span>,<span class="st">"Eats_Veggies"</span>)),</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">Sex=</span><span class="fu">factor</span>(Sex, <span class="at">level=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Female"</span>,<span class="st">"Male"</span>)),</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">GenHlth=</span><span class="fu">factor</span>(GenHlth,<span class="at">levels=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>), </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Excellent"</span>,<span class="st">"Very Good"</span>,<span class="st">"Good"</span>,<span class="st">"Fair"</span>,<span class="st">"Poor"</span>)),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Excellent"</span>,<span class="st">"Very_Good"</span>,<span class="st">"Good"</span>,<span class="st">"Fair"</span>,<span class="st">"Poor"</span>)),</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">Age=</span><span class="fu">factor</span>(Age, <span class="at">levels=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">11</span>,<span class="dv">12</span>,<span class="dv">13</span>),</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"18-24"</span>,<span class="st">"25-29"</span>,<span class="st">"30-34"</span>,<span class="st">"35-39"</span>,<span class="st">"40-44"</span>,<span class="st">"45-49"</span>,<span class="st">"50-54"</span>,<span class="st">"55-59"</span>,</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"60-64"</span>,<span class="st">"65-69"</span>,<span class="st">"70-74"</span>,<span class="st">"75-79"</span>,<span class="st">"80+"</span> )),</span>
@@ -198,7 +205,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  $ HvyAlcoholConsump   : Factor w/ 2 levels "Not_Heavy Drinker",..: 1 1 1 1 1 1 1 1 1 1 ...
  $ AnyHealthcare       : Factor w/ 2 levels "No_Health_Coverage",..: 2 1 2 2 2 2 2 2 2 2 ...
  $ NoDocbcCost         : Factor w/ 2 levels "Cost_Issue","Cost_Not_Issue": 1 2 2 1 1 1 1 1 1 1 ...
- $ GenHlth             : Factor w/ 5 levels "Excellent","Very Good",..: 5 3 5 2 2 2 3 3 5 2 ...
+ $ GenHlth             : Factor w/ 5 levels "Excellent","Very_Good",..: 5 3 5 2 2 2 3 3 5 2 ...
  $ MentHlth            : num  18 0 30 0 3 0 0 0 30 0 ...
  $ PhysHlth            : num  15 0 30 0 0 2 14 0 30 0 ...
  $ DiffWalk            : Factor w/ 2 levels "No_Difficulty_Walking",..: 2 1 2 1 1 1 1 2 2 1 ...
@@ -439,13 +446,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-</section>
-<section id="click-here-for-the-modeling-page" class="level2">
-<h2 class="anchored" data-anchor-id="click-here-for-the-modeling-page">Click here for the modeling page</h2>
-</section>
-<section id="navigation" class="level2">
-<h2 class="anchored" data-anchor-id="navigation">Navigation</h2>
-<p>Navigate to the <a href="modeling.html">Modeling Page</a> for more details about the modeling process.</p>
 
 
 </section>

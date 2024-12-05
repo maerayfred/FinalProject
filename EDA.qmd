@@ -3,8 +3,22 @@ title: "EDA"
 format: html
 editor: visual
 ---
+## Introduction to the data and my Analysis
 
-## Reading in Data and Converting Variables
+
+This data set,originally a CSV file, containing cleaned data from approximately 250,000 individuals. It includes 21 variables derived directly from respondents or calculated based on their responses. The data was collected through a phone survey focused on Behavioral Risk Factors.
+
+The primary goal of this data collection and subsequent analysis is to identify the most common predictors for determining whether an individual is more likely to report having diabetes. Key variables of interest include:
+
+-Sex (Gender): The respondent's reported gender.
+-Veggies: Whether the respondent consumes vegetables one or more times per day.
+-AnyHealthcare: Whether the respondent has any form of health insurance coverage.
+-GenHealth: A self-reported health status on a scale from 1 (excellent) to 5 (poor).
+-PhysActivity: Whether the respondent engaged in physical activity (excluding work-related activity) within the past 30 days.
+
+The purpose of the exploratory data analysis (EDA) is to ensure the data is clean, prepare it for analysis (e.g., converting numeric responses into meaningful categories for better interpretation), and examine the prevalence of these potential risk factors.
+
+## Reading in Data and Converting Variables.
 
 ```{r}
 library(tidyverse)
@@ -40,10 +54,11 @@ data<- data|>
          DiffWalk=factor(DiffWalk,levels=c(0,1),labels=c("No_Difficulty_Walking","Difficulty_Walking"))
          )
 
+#Displaying the data for you to see the factor levels, and which variables are numeric.
 str(data)
 ```
 
-## Basic Summaries and Rates of Missing
+## Confirming the data doesn't have any missing observations. 
 
 ```{r}
 sum_na<-function(column){
@@ -54,8 +69,16 @@ na_counts<-data|>
   summarize(across(everything(),sum_na))
 
 print(na_counts)
+```
 
+## In this section, I aimed to explore basic descriptive statistics, including the minimum, maximum, mean, median, and spread, for the numeric variables. The variables analyzed include:
 
+BMI (Body Mass Index): A measure of body weight relative to height.
+MentHlth: The number of days in the past month affected by stress, depression, or other mental health issues.
+PhysHlth: The number of days in the past month affected by physical illness or injury.
+Mental and physical well-being are critical components of overall health. In this analysis, I observed that the mean and median for both MentHlth and PhysHlth are 0, with an interquartile range (IQR) of 0. This suggests that, for the majority of respondents in this dataset, mental and physical health issues have minimal reported impact, indicating these factors may not significantly affect this surveyed group.
+
+```{r}
 summaries<- data|>
   summarize(across(where(is.numeric),
                    list("mean"=mean,
@@ -69,52 +92,82 @@ print(summaries)
 
 ```
 
+## To begin, I analyzed the distribution of diabetes status by gender. While the dataset contains a higher number of women compared to men, the prevalence of diabetes appears to be similar between the two groups.
 
 ```{r}
+
 table(data$Sex,data$Diabetes_binary)
 
-table(data$Sex,data$Diabetes_binary,data$Age)
 
-table(data$Education,data$HighBP)
 
-table(data$Education,data$HighChol)
-
-table(data$Income)
-
-data2<-data|>
-  filter( Income != ">=75K" )
-
-table(data2$Fruits,data2$Veggies,data2$Diabetes_binary)
+ggplot(data=data,aes(x=Sex,fill=Diabetes_binary))+
+  geom_bar()+
+  labs(x="Sex")+
+  scale_fill_discrete("Diagnosis")+
+  coord_flip()
 
 ```
 
+## Pie Chart
+I analyzed the relationship between individuals' self-reported general health levels and their diabetes status. My initial hunch was that individuals reporting excellent health would have lower rates of diabetes, while those reporting poor health would exhibit the highest rates. Given that the average diabetes prevalence in the United States is approximately 20%, I anticipated this trend to hold across the dataset.
+
+Upon examining the data, an interesting pattern emerged: individuals reporting "Good" and "Fair" general health had unexpectedly higher rates of diabetes, while those reporting "Poor" health had lower-than-expected rates. Specifically, a pie chart visualization revealed that approximately 38.1% of individuals reporting "Good" general health had diabetes, followed by 27.7% of those reporting "Fair" health. In contrast, only 13% of individuals who reported "Poor" general health were diabetic.
 
 ```{r}
-ggplot(data=data,aes(x=Sex,fill=Diabetes_binary))+
-  geom_bar(position="fill")+
-  labs(x="Sex")+
-  scale_fill_discrete("Diabetes Status")
+
+library(ggplot2)
+library(dplyr)
+
+#Table with counts of reported general health 
+table(data$GenHlth,data$Diabetes_binary)
 
 
+# Filter the data for individuals with diabetes
+data_with_diabetes <- data |>
+  filter(Diabetes_binary == "Diabetic")
 
-ggplot(data=data|>group_by(Income),aes(x=Income,fill=Diabetes_binary))+
-  geom_bar(position="fill")+
-  labs(x="Income")+
-  scale_fill_discrete("Diabetes Status")
+# Calculate the percentages of each health status
+health_status_percent <- data_with_diabetes |>
+  group_by(GenHlth) |>
+  summarise(Count = n()) |>
+  mutate(Percentage = round(Count / sum(Count) * 100, 1))
+
+
+ggplot(health_status_percent, aes(x = "", y = Percentage, fill = GenHlth)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(Percentage, "%")), position = position_stack(vjust = 0.5)) +
+  labs(title = "General Health Status for People with Diabetes") 
+ 
+
+
 ```
+
+
+
+
 
 ```{r}
 # Create a grouped boxplot using ggplot2
-ggplot(data = data, aes(x = Education, y = BMI,
-                        fill = factor(Income))) +
+ggplot(data = data, aes(x = Veggies, y = BMI,
+                        fill = factor(Diabetes_binary))) +
   geom_boxplot() +
   theme_minimal() +
-  labs(fill = "Income")
+  labs(fill = "Diabetes Status")
 ```
-## Click here for the modeling page
+
+```{r}
+ggplot(data = data, aes(x = PhysActivity, y = BMI,
+                        fill = factor(Diabetes_binary))) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(fill = "Diabetes Status")
+```
+
+
+
 
 
 ## Navigation
 
-Navigate to the [Modeling Page](modeling.html) for more details about the modeling process.
-
+Navigate to the [Modeling Page](modeling.html) for more details about the modeling
