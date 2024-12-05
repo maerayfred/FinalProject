@@ -70,7 +70,7 @@ data<- data|>
 
 set.seed(1234)
 
-split_data<-initial_split(data,prop=0.1,strata = Diabetes_binary)
+split_data<-initial_split(data,prop=0.7,strata = Diabetes_binary)
 train_data<-training(split_data)
 test_data<-testing(split_data)
 cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
@@ -81,15 +81,15 @@ cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
 
 ```{r}
 data2<-data|>
-  select(Sex,Smoker,AnyHealthcare,GenHlth,PhysActivity)
+  select(Sex,Veggies,AnyHealthcare,GenHlth,PhysActivity)
 
 
-rec1<-recipe(Diabetes_binary~ Sex+Smoker+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
-   step_dummy(Sex,Smoker,GenHlth,AnyHealthcare,PhysActivity)
+rec1<-recipe(Diabetes_binary~Sex+Veggies+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
+   step_dummy(Sex,Veggies,GenHlth,AnyHealthcare,PhysActivity)
 
 
 
-rf_spec<-rand_forest(mtry=tune())|>
+rf_spec<-rand_forest(mtry=tune(),trees = 100)|>
   set_engine("ranger", importance = "impurity")|>
   set_mode("classification")
 

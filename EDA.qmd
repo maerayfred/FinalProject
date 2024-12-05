@@ -145,7 +145,7 @@ ggplot(health_status_percent, aes(x = "", y = Percentage, fill = GenHlth)) +
 
 
 
-
+## Next, I explored the relationship between lifestyle factors, specifically daily vegetable consumption and physical activity, and their association with elevated BMI and the prevalence of diabetes. I focused on these behaviors rather than metrics such as high cholesterol or blood pressure, as my interest was in examining individual habits rather than physiological indicators. The analysis revealed that among participants with diabetes who reported not consuming vegetables daily, approximately 75% had a BMI exceeding the median BMI of those who consumed vegetables daily and were not diabetic.
 
 ```{r}
 # Create a grouped boxplot using ggplot2
@@ -155,6 +155,8 @@ ggplot(data = data, aes(x = Veggies, y = BMI,
   theme_minimal() +
   labs(fill = "Diabetes Status")
 ```
+
+## A similar trend is observed with physical activity as with vegetable consumption.
 
 ```{r}
 ggplot(data = data, aes(x = PhysActivity, y = BMI,
@@ -168,6 +170,6 @@ ggplot(data = data, aes(x = PhysActivity, y = BMI,
 
 
 
-## Navigation
+## Having examined the predictor variables I consider most significant, I will now incorporate them into a classification tree and random forest model. Click the link below to explore this analysis further
 
 Navigate to the [Modeling Page](modeling.html) for more details about the modeling
