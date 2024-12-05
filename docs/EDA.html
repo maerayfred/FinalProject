@@ -135,13 +135,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction-to-the-data-and-my-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-to-the-data-and-my-analysis">Introduction to the data and my Analysis</h2>
-<p>This data set,originally a CSV file, containing cleaned data from approximately 440,000 individuals. It includes 21 variables derived directly from respondents or calculated based on their responses. The data was collected through a phone survey focused on Behavioral Risk Factors.</p>
+<p>This data set,originally a CSV file, containing cleaned data from approximately 250,000 individuals. It includes 21 variables derived directly from respondents or calculated based on their responses. The data was collected through a phone survey focused on Behavioral Risk Factors.</p>
 <p>The primary goal of this data collection and subsequent analysis is to identify the most common predictors for determining whether an individual is more likely to report having diabetes. Key variables of interest include:</p>
 <p>-Sex (Gender): The respondent’s reported gender. -Veggies: Whether the respondent consumes vegetables one or more times per day. -AnyHealthcare: Whether the respondent has any form of health insurance coverage. -GenHealth: A self-reported health status on a scale from 1 (excellent) to 5 (poor). -PhysActivity: Whether the respondent engaged in physical activity (excluding work-related activity) within the past 30 days.</p>
 <p>The purpose of the exploratory data analysis (EDA) is to ensure the data is clean, prepare it for analysis (e.g., converting numeric responses into meaningful categories for better interpretation), and examine the prevalence of these potential risk factors.</p>
 </section>
-<section id="reading-in-data-and-converting-variables" class="level2">
-<h2 class="anchored" data-anchor-id="reading-in-data-and-converting-variables">Reading in Data and Converting Variables</h2>
+<section id="reading-in-data-and-converting-variables." class="level2">
+<h2 class="anchored" data-anchor-id="reading-in-data-and-converting-variables.">Reading in Data and Converting Variables.</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -188,7 +188,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">DiffWalk=</span><span class="fu">factor</span>(DiffWalk,<span class="at">levels=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">labels=</span><span class="fu">c</span>(<span class="st">"No_Difficulty_Walking"</span>,<span class="st">"Difficulty_Walking"</span>))</span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>         )</span>
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Displaying the data for you to see the factor levels, and which variables are numeric.</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>'data.frame':   253680 obs. of  22 variables:
  $ Diabetes_binary     : Factor w/ 2 levels "Not_Diabetic",..: 1 1 1 1 1 1 1 1 2 1 ...
@@ -216,8 +217,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="basic-summaries-and-rates-of-missing" class="level2">
-<h2 class="anchored" data-anchor-id="basic-summaries-and-rates-of-missing">Basic Summaries and Rates of Missing</h2>
+<section id="confirming-the-data-doesnt-have-any-missing-observations." class="level2">
+<h2 class="anchored" data-anchor-id="confirming-the-data-doesnt-have-any-missing-observations.">Confirming the data doesn’t have any missing observations.</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sum_na<span class="ot">&lt;-</span><span class="cf">function</span>(column){</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">is.na</span>(column))</span>
@@ -237,6 +238,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   Education Income
 1         0      0</code></pre>
 </div>
+</div>
+</section>
+<section id="in-this-section-i-aimed-to-explore-basic-descriptive-statistics-including-the-minimum-maximum-mean-median-and-spread-for-the-numeric-variables.-the-variables-analyzed-include" class="level2">
+<h2 class="anchored" data-anchor-id="in-this-section-i-aimed-to-explore-basic-descriptive-statistics-including-the-minimum-maximum-mean-median-and-spread-for-the-numeric-variables.-the-variables-analyzed-include">In this section, I aimed to explore basic descriptive statistics, including the minimum, maximum, mean, median, and spread, for the numeric variables. The variables analyzed include:</h2>
+<p>BMI (Body Mass Index): A measure of body weight relative to height. MentHlth: The number of days in the past month affected by stress, depression, or other mental health issues. PhysHlth: The number of days in the past month affected by physical illness or injury. Mental and physical well-being are critical components of overall health. In this analysis, I observed that the mean and median for both MentHlth and PhysHlth are 0, with an interquartile range (IQR) of 0. This suggests that, for the majority of respondents in this dataset, mental and physical health issues have minimal reported impact, indicating these factors may not significantly affect this surveyed group.</p>
+<div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>summaries<span class="ot">&lt;-</span> data<span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric),</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">list</span>(<span class="st">"mean"</span><span class="ot">=</span>mean,</span>
@@ -258,6 +265,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 1            3</code></pre>
 </div>
 </div>
+</section>
+<section id="to-begin-i-analyzed-the-distribution-of-diabetes-status-by-gender.-while-the-dataset-contains-a-higher-number-of-women-compared-to-men-the-prevalence-of-diabetes-appears-to-be-similar-between-the-two-groups." class="level2">
+<h2 class="anchored" data-anchor-id="to-begin-i-analyzed-the-distribution-of-diabetes-status-by-gender.-while-the-dataset-contains-a-higher-number-of-women-compared-to-men-the-prevalence-of-diabetes-appears-to-be-similar-between-the-two-groups.">To begin, I analyzed the distribution of diabetes status by gender. While the dataset contains a higher number of women compared to men, the prevalence of diabetes appears to be similar between the two groups.</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>Sex,data<span class="sc">$</span>Diabetes_binary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -266,152 +276,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   Female       123563    18411
   Male          94771    16935</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>Sex,data<span class="sc">$</span>Diabetes_binary,data<span class="sc">$</span>Age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>, ,  = 18-24
-
-        
-         Not_Diabetic Diabetic
-  Female         2700       45
-  Male           2922       33
-
-, ,  = 25-29
-
-        
-         Not_Diabetic Diabetic
-  Female         3902       89
-  Male           3556       51
-
-, ,  = 30-34
-
-        
-         Not_Diabetic Diabetic
-  Female         5871      191
-  Male           4938      123
-
-, ,  = 35-39
-
-        
-         Not_Diabetic Diabetic
-  Female         7359      366
-  Male           5838      260
-
-, ,  = 40-44
-
-        
-         Not_Diabetic Diabetic
-  Female         8560      576
-  Male           6546      475
-
-, ,  = 45-49
-
-        
-         Not_Diabetic Diabetic
-  Female        10026      902
-  Male           8051      840
-
-, ,  = 50-54
-
-        
-         Not_Diabetic Diabetic
-  Female        13163     1642
-  Male          10063     1446
-
-, ,  = 55-59
-
-        
-         Not_Diabetic Diabetic
-  Female        15214     2255
-  Male          11355     2008
-
-, ,  = 60-64
-
-        
-         Not_Diabetic Diabetic
-  Female        15303     2968
-  Male          12208     2765
-
-, ,  = 65-69
-
-        
-         Not_Diabetic Diabetic
-  Female        14493     3250
-  Male          11143     3308
-
-, ,  = 70-74
-
-        
-         Not_Diabetic Diabetic
-  Female        10606     2553
-  Male           7786     2588
-
-, ,  = 75-79
-
-        
-         Not_Diabetic Diabetic
-  Female         7584     1834
-  Male           4993     1569
-
-, ,  = 80+
-
-        
-         Not_Diabetic Diabetic
-  Female         8782     1740
-  Male           5372     1469</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>Education,data<span class="sc">$</span>HighBP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                             
-                              Normal_BP High_BP
-  None-K                             86      88
-  Grades 1-8                       1654    2389
-  Grades 9-11                      3975    5503
-  HS Diploma                      31030   31720
-  Some College                    39019   30891
-  Bachelor's Degree or Higher     69087   38238</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>Education,data<span class="sc">$</span>HighChol)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                             
-                              Normal_Chol High_Chol
-  None-K                               87        87
-  Grades 1-8                         1878      2165
-  Grades 9-11                        4741      4737
-  HS Diploma                        33789     28961
-  Some College                      40223     29687
-  Bachelor's Degree or Higher       65371     41954</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>Income)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
- &lt;10K  &lt;15K  &lt;20K  &lt;25K  &lt;35K  &lt;50K  &lt;75K &gt;=75K 
- 9811 11783 15994 20135 25883 36470 43219 90385 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>data2<span class="ot">&lt;-</span>data<span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>( Income <span class="sc">!=</span> <span class="st">"&gt;=75K"</span> )</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data2<span class="sc">$</span>Fruits,data2<span class="sc">$</span>Veggies,data2<span class="sc">$</span>Diabetes_binary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>, ,  = Not_Diabetic
-
-             
-              No_Veggies Eats_Veggies
-  No_Fruits        18057        33201
-  Eats_Fruits      10772        73114
-
-, ,  = Diabetic
-
-             
-              No_Veggies Eats_Veggies
-  No_Fruits         4598         7293
-  Eats_Fruits       2899        13361</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>data,<span class="fu">aes</span>(<span class="at">x=</span>Sex,<span class="at">fill=</span>Diabetes_binary))<span class="sc">+</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">"fill"</span>)<span class="sc">+</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Sex"</span>)<span class="sc">+</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(<span class="st">"Diabetes Status"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>data,<span class="fu">aes</span>(<span class="at">x=</span>Sex,<span class="at">fill=</span>Diabetes_binary))<span class="sc">+</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()<span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Sex"</span>)<span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(<span class="st">"Diagnosis"</span>)<span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -419,25 +288,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>data<span class="sc">|&gt;</span><span class="fu">group_by</span>(Income),<span class="fu">aes</span>(<span class="at">x=</span>Income,<span class="at">fill=</span>Diabetes_binary))<span class="sc">+</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">"fill"</span>)<span class="sc">+</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Income"</span>)<span class="sc">+</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(<span class="st">"Diabetes Status"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="EDA_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
 </div>
-</div>
-</div>
+</section>
+<section id="pie-chart" class="level2">
+<h2 class="anchored" data-anchor-id="pie-chart">Pie Chart</h2>
+<p>I analyzed the relationship between individuals’ self-reported general health levels and their diabetes status. My initial hunch was that individuals reporting excellent health would have lower rates of diabetes, while those reporting poor health would exhibit the highest rates. Given that the average diabetes prevalence in the United States is approximately 20%, I anticipated this trend to hold across the dataset.</p>
+<p>Upon examining the data, an interesting pattern emerged: individuals reporting “Good” and “Fair” general health had unexpectedly higher rates of diabetes, while those reporting “Poor” health had lower-than-expected rates. Specifically, a pie chart visualization revealed that approximately 38.1% of individuals reporting “Good” general health had diabetes, followed by 27.7% of those reporting “Fair” health. In contrast, only 13% of individuals who reported “Poor” general health were diabetic.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grouped boxplot using ggplot2</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> data, <span class="fu">aes</span>(<span class="at">x =</span> Education, <span class="at">y =</span> BMI,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">fill =</span> <span class="fu">factor</span>(Income))) <span class="sc">+</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Income"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Table with counts of reported general health </span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>GenHlth,data<span class="sc">$</span>Diabetes_binary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           
+            Not_Diabetic Diabetic
+  Excellent        44159     1140
+  Very_Good        82703     6381
+  Good             62189    13457
+  Fair             21780     9790
+  Poor              7503     4578</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the data for individuals with diabetes</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>data_with_diabetes <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Diabetes_binary <span class="sc">==</span> <span class="st">"Diabetic"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the percentages of each health status</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>health_status_percent <span class="ot">&lt;-</span> data_with_diabetes <span class="sc">|&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(GenHlth) <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Count =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Percentage =</span> <span class="fu">round</span>(Count <span class="sc">/</span> <span class="fu">sum</span>(Count) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(health_status_percent, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> Percentage, <span class="at">fill =</span> GenHlth)) <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">width =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_polar</span>(<span class="st">"y"</span>, <span class="at">start =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(Percentage, <span class="st">"%"</span>)), <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"General Health Status for People with Diabetes"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -446,6 +333,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="next-i-explored-the-relationship-between-lifestyle-factors-specifically-daily-vegetable-consumption-and-physical-activity-and-their-association-with-elevated-bmi-and-the-prevalence-of-diabetes.-i-focused-on-these-behaviors-rather-than-metrics-such-as-high-cholesterol-or-blood-pressure-as-my-interest-was-in-examining-individual-habits-rather-than-physiological-indicators.-the-analysis-revealed-that-among-participants-with-diabetes-who-reported-not-consuming-vegetables-daily-approximately-75-had-a-bmi-exceeding-the-median-bmi-of-those-who-consumed-vegetables-daily-and-were-not-diabetic." class="level2">
+<h2 class="anchored" data-anchor-id="next-i-explored-the-relationship-between-lifestyle-factors-specifically-daily-vegetable-consumption-and-physical-activity-and-their-association-with-elevated-bmi-and-the-prevalence-of-diabetes.-i-focused-on-these-behaviors-rather-than-metrics-such-as-high-cholesterol-or-blood-pressure-as-my-interest-was-in-examining-individual-habits-rather-than-physiological-indicators.-the-analysis-revealed-that-among-participants-with-diabetes-who-reported-not-consuming-vegetables-daily-approximately-75-had-a-bmi-exceeding-the-median-bmi-of-those-who-consumed-vegetables-daily-and-were-not-diabetic.">Next, I explored the relationship between lifestyle factors, specifically daily vegetable consumption and physical activity, and their association with elevated BMI and the prevalence of diabetes. I focused on these behaviors rather than metrics such as high cholesterol or blood pressure, as my interest was in examining individual habits rather than physiological indicators. The analysis revealed that among participants with diabetes who reported not consuming vegetables daily, approximately 75% had a BMI exceeding the median BMI of those who consumed vegetables daily and were not diabetic.</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grouped boxplot using ggplot2</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> data, <span class="fu">aes</span>(<span class="at">x =</span> Veggies, <span class="at">y =</span> BMI,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">fill =</span> <span class="fu">factor</span>(Diabetes_binary))) <span class="sc">+</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Diabetes Status"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EDA_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="a-similar-trend-is-observed-with-physical-activity-as-with-vegetable-consumption." class="level2">
+<h2 class="anchored" data-anchor-id="a-similar-trend-is-observed-with-physical-activity-as-with-vegetable-consumption.">A similar trend is observed with physical activity as with vegetable consumption.</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> data, <span class="fu">aes</span>(<span class="at">x =</span> PhysActivity, <span class="at">y =</span> BMI,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">fill =</span> <span class="fu">factor</span>(Diabetes_binary))) <span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Diabetes Status"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="EDA_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="having-examined-the-predictor-variables-i-consider-most-significant-i-will-now-incorporate-them-into-a-classification-tree-and-random-forest-model.-click-the-link-below-to-explore-this-analysis-further" class="level2">
+<h2 class="anchored" data-anchor-id="having-examined-the-predictor-variables-i-consider-most-significant-i-will-now-incorporate-them-into-a-classification-tree-and-random-forest-model.-click-the-link-below-to-explore-this-analysis-further">Having examined the predictor variables I consider most significant, I will now incorporate them into a classification tree and random forest model. Click the link below to explore this analysis further</h2>
+<p>Navigate to the <a href="modeling.html">Modeling Page</a> for more details about the modeling</p>
 
 
 </section>

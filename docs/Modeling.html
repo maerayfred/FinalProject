@@ -156,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✖ dplyr::filter()  masks stats::filter()
 ✖ dplyr::lag()     masks stats::lag()
 ✖ recipes::step()  masks stats::step()
-• Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
+• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -277,7 +277,7 @@ The following object is masked from 'package:purrr':
 <span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>split_data<span class="ot">&lt;-</span><span class="fu">initial_split</span>(data,<span class="at">prop=</span><span class="fl">0.1</span>,<span class="at">strata =</span> Diabetes_binary)</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>split_data<span class="ot">&lt;-</span><span class="fu">initial_split</span>(data,<span class="at">prop=</span><span class="fl">0.7</span>,<span class="at">strata =</span> Diabetes_binary)</span>
 <span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>train_data<span class="ot">&lt;-</span><span class="fu">training</span>(split_data)</span>
 <span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>test_data<span class="ot">&lt;-</span><span class="fu">testing</span>(split_data)</span>
 <span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>cv_fold_data<span class="ot">&lt;-</span><span class="fu">vfold_cv</span>(train_data,<span class="at">v=</span><span class="dv">5</span>,<span class="at">strata=</span>Diabetes_binary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -287,15 +287,15 @@ The following object is masked from 'package:purrr':
 <h2 class="anchored" data-anchor-id="random-forest-model">Random Forest Model</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>data2<span class="ot">&lt;-</span>data<span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Sex,Smoker,AnyHealthcare,GenHlth,PhysActivity)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Sex,Veggies,AnyHealthcare,GenHlth,PhysActivity)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>rec1<span class="ot">&lt;-</span><span class="fu">recipe</span>(Diabetes_binary<span class="sc">~</span> Sex<span class="sc">+</span>Smoker<span class="sc">+</span>AnyHealthcare<span class="sc">+</span>GenHlth<span class="sc">+</span>PhysActivity,<span class="at">data=</span>train_data)<span class="sc">|&gt;</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">step_dummy</span>(Sex,Smoker,GenHlth,AnyHealthcare,PhysActivity)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>rec1<span class="ot">&lt;-</span><span class="fu">recipe</span>(Diabetes_binary<span class="sc">~</span>Sex<span class="sc">+</span>Veggies<span class="sc">+</span>AnyHealthcare<span class="sc">+</span>GenHlth<span class="sc">+</span>PhysActivity,<span class="at">data=</span>train_data)<span class="sc">|&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">step_dummy</span>(Sex,Veggies,GenHlth,AnyHealthcare,PhysActivity)</span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>rf_spec<span class="ot">&lt;-</span><span class="fu">rand_forest</span>(<span class="at">mtry=</span><span class="fu">tune</span>())<span class="sc">|&gt;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>rf_spec<span class="ot">&lt;-</span><span class="fu">rand_forest</span>(<span class="at">mtry=</span><span class="fu">tune</span>(),<span class="at">trees =</span> <span class="dv">100</span>)<span class="sc">|&gt;</span></span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>, <span class="at">importance =</span> <span class="st">"impurity"</span>)<span class="sc">|&gt;</span></span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
@@ -318,10 +318,10 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 4 × 7
    mtry .metric     .estimator  mean     n  std_err .config             
   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
-1     4 mn_log_loss binary     0.359     5 0.000440 Preprocessor1_Model4
-2     3 mn_log_loss binary     0.360     5 0.000484 Preprocessor1_Model3
-3     2 mn_log_loss binary     0.364     5 0.000534 Preprocessor1_Model2
-4     1 mn_log_loss binary     0.376     5 0.000268 Preprocessor1_Model1</code></pre>
+1     4 mn_log_loss binary     0.358     5 0.000387 Preprocessor1_Model4
+2     3 mn_log_loss binary     0.359     5 0.000375 Preprocessor1_Model3
+3     2 mn_log_loss binary     0.364     5 0.000600 Preprocessor1_Model2
+4     1 mn_log_loss binary     0.376     5 0.000364 Preprocessor1_Model1</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>rf_best_params<span class="ot">&lt;-</span><span class="fu">select_best</span>(rf_fit,<span class="at">metric =</span> <span class="st">"mn_log_loss"</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>rf_best_params</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -342,7 +342,7 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 1 × 4
   .metric     .estimator .estimate .config             
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-1 mn_log_loss binary         0.358 Preprocessor1_Model1</code></pre>
+1 mn_log_loss binary         0.357 Preprocessor1_Model1</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">extract_fit_parsnip</span>(rf_final_fit)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>importance <span class="ot">&lt;-</span> ranger<span class="sc">::</span><span class="fu">importance</span>(rf_model<span class="sc">$</span>fit)</span>
@@ -355,14 +355,14 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 8 × 2
   variable                          importance
   &lt;chr&gt;                                  &lt;dbl&gt;
-1 GenHlth_Fair                           198. 
-2 GenHlth_Poor                           166. 
-3 GenHlth_Good                            98.4
-4 GenHlth_Very_Good                       43.7
-5 PhysActivity_Physical_Activity          36.3
-6 Smoker_Smoker                           12.8
-7 AnyHealthcare_Yes_Health_Coverage       12.7
-8 Sex_Male                                12.3</code></pre>
+1 GenHlth_Fair                          1448. 
+2 GenHlth_Poor                          1117. 
+3 GenHlth_Good                           746. 
+4 GenHlth_Very_Good                      269. 
+5 PhysActivity_Physical_Activity         185. 
+6 Sex_Male                                50.0
+7 AnyHealthcare_Yes_Health_Coverage       47.9
+8 Veggies_Eats_Veggies                    25.7</code></pre>
 </div>
 </div>
 </section>
@@ -388,16 +388,16 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 10 × 8
    cost_complexity tree_depth .metric     .estimator  mean     n std_err .config
              &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;  
- 1        4.79e- 3          2 mn_log_loss binary     0.404     5 5.51e-5 Prepro…
- 2        3.52e- 7          9 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 3        2.44e- 6         12 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 4        9.36e- 6          6 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 5        2.53e- 9          3 mn_log_loss binary     0.404     5 5.51e-5 Prepro…
- 6        3.25e- 4          4 mn_log_loss binary     0.404     5 5.51e-5 Prepro…
- 7        1.12e- 4         13 mn_log_loss binary     0.393     5 6.70e-3 Prepro…
- 8        2.75e- 2         15 mn_log_loss binary     0.404     5 5.51e-5 Prepro…
- 9        8.90e- 9          8 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
-10        2.22e-10         10 mn_log_loss binary     0.378     5 5.38e-4 Prepro…</code></pre>
+ 1        3.68e- 3          4 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 2        5.69e-10          9 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 3        5.06e- 9          6 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 4        3.87e- 5          3 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 5        2.38e- 7         12 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 6        1.02e- 3         13 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 7        9.14e- 7         14 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 8        3.68e- 8          2 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 9        1.09e- 5          8 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+10        4.29e- 2          8 mn_log_loss binary     0.404     5 9.73e-6 Prepro…</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>  tree_grid<span class="ot">&lt;-</span><span class="fu">grid_regular</span>(<span class="fu">cost_complexity</span>(),</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">tree_depth</span>(),</span>
@@ -411,13 +411,13 @@ The following object is masked from 'package:purrr':
 <pre><code># Tuning results
 # 5-fold cross-validation using stratification 
 # A tibble: 5 × 4
-  splits               id    .metrics          .notes          
-  &lt;list&gt;               &lt;chr&gt; &lt;list&gt;            &lt;list&gt;          
-1 &lt;split [20293/5074]&gt; Fold1 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
-2 &lt;split [20293/5074]&gt; Fold2 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
-3 &lt;split [20293/5074]&gt; Fold3 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
-4 &lt;split [20294/5073]&gt; Fold4 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
-5 &lt;split [20295/5072]&gt; Fold5 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;</code></pre>
+  splits                 id    .metrics          .notes          
+  &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;            &lt;list&gt;          
+1 &lt;split [142059/35516]&gt; Fold1 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
+2 &lt;split [142059/35516]&gt; Fold2 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
+3 &lt;split [142060/35515]&gt; Fold3 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
+4 &lt;split [142061/35514]&gt; Fold4 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;
+5 &lt;split [142061/35514]&gt; Fold5 &lt;tibble [25 × 6]&gt; &lt;tibble [0 × 3]&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>  tree_fits<span class="sc">|&gt;</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_metrics</span>()<span class="sc">|&gt;</span></span>
@@ -427,16 +427,16 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 25 × 8
    cost_complexity tree_depth .metric     .estimator  mean     n std_err .config
              &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;  
- 1    0.0000000001          8 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 2    0.0000000178          8 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 3    0.00000316            8 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 4    0.0000000001         11 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 5    0.0000000178         11 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 6    0.00000316           11 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 7    0.0000000001         15 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 8    0.0000000178         15 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
- 9    0.00000316           15 mn_log_loss binary     0.378     5 5.38e-4 Prepro…
-10    0.0000000001          1 mn_log_loss binary     0.404     5 5.51e-5 Prepro…
+ 1    0.0000000001          1 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 2    0.0000000178          1 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 3    0.00000316            1 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 4    0.000562              1 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 5    0.1                   1 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 6    0.0000000001          4 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 7    0.0000000178          4 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 8    0.00000316            4 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+ 9    0.000562              4 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
+10    0.1                   4 mn_log_loss binary     0.404     5 9.73e-6 Prepro…
 # ℹ 15 more rows</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tree_best_params<span class="ot">&lt;-</span><span class="fu">select_best</span>(tree_fits, <span class="at">metric=</span><span class="st">"mn_log_loss"</span>)</span>
@@ -445,7 +445,7 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 1 × 3
   cost_complexity tree_depth .config              
             &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;                
-1    0.0000000001          8 Preprocessor1_Model11</code></pre>
+1    0.0000000001          1 Preprocessor1_Model01</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>tree_final_wkf<span class="ot">&lt;-</span>tree_wkf<span class="sc">|&gt;</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(tree_best_params)</span>
@@ -459,7 +459,7 @@ The following object is masked from 'package:purrr':
 # A tibble: 1 × 6
   splits                 id            .metrics .notes   .predictions .workflow 
   &lt;list&gt;                 &lt;chr&gt;         &lt;list&gt;   &lt;list&gt;   &lt;list&gt;       &lt;list&gt;    
-1 &lt;split [25367/228313]&gt; train/test s… &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;</code></pre>
+1 &lt;split [177575/76105]&gt; train/test s… &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>tree_final_fit<span class="sc">|&gt;</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -467,7 +467,7 @@ The following object is masked from 'package:purrr':
 <pre><code># A tibble: 1 × 4
   .metric     .estimator .estimate .config             
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-1 mn_log_loss binary         0.378 Preprocessor1_Model1</code></pre>
+1 mn_log_loss binary         0.404 Preprocessor1_Model1</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>tree_final_model<span class="ot">&lt;-</span><span class="fu">extract_workflow</span>(tree_final_fit)</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>tree_final_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -482,24 +482,12 @@ Model: decision_tree()
 • step_dummy()
 
 ── Model ───────────────────────────────────────────────────────────────────────
-n= 25367 
+n= 177575 
 
 node), split, n, loss, yval, (yprob)
       * denotes terminal node
 
- 1) root 25367 3534 Not_Diabetic (0.86068514 0.13931486)  
-   2) GenHlth_Fair&lt; 0.5 22210 2562 Not_Diabetic (0.88464656 0.11535344)  
-     4) GenHlth_Poor&lt; 0.5 20927 2078 Not_Diabetic (0.90070244 0.09929756) *
-     5) GenHlth_Poor&gt;=0.5 1283  484 Not_Diabetic (0.62275916 0.37724084)  
-      10) Smoker_Smoker&gt;=0.5 822  291 Not_Diabetic (0.64598540 0.35401460) *
-      11) Smoker_Smoker&lt; 0.5 461  193 Not_Diabetic (0.58134490 0.41865510)  
-        22) AnyHealthcare_Yes_Health_Coverage&lt; 0.5 27   10 Not_Diabetic (0.62962963 0.37037037)  
-          44) Sex_Male&gt;=0.5 9    1 Not_Diabetic (0.88888889 0.11111111) *
-          45) Sex_Male&lt; 0.5 18    9 Not_Diabetic (0.50000000 0.50000000)  
-            90) PhysActivity_Physical_Activity&lt; 0.5 12    5 Not_Diabetic (0.58333333 0.41666667) *
-            91) PhysActivity_Physical_Activity&gt;=0.5 6    2 Diabetic (0.33333333 0.66666667) *
-        23) AnyHealthcare_Yes_Health_Coverage&gt;=0.5 434  183 Not_Diabetic (0.57834101 0.42165899) *
-   3) GenHlth_Fair&gt;=0.5 3157  972 Not_Diabetic (0.69211277 0.30788723) *</code></pre>
+1) root 177575 24742 Not_Diabetic (0.8606673 0.1393327) *</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>tree_final_model <span class="sc">%&gt;%</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span> () <span class="sc">%&gt;%</span></span>
@@ -534,17 +522,17 @@ Model: rand_forest()
 Ranger result
 
 Call:
- ranger::ranger(x = maybe_data_frame(x), y = y, mtry = min_cols(~4L,      x), importance = ~"impurity", num.threads = 1, verbose = FALSE,      seed = sample.int(10^5, 1), probability = TRUE) 
+ ranger::ranger(x = maybe_data_frame(x), y = y, mtry = min_cols(~4L,      x), num.trees = ~100, importance = ~"impurity", num.threads = 1,      verbose = FALSE, seed = sample.int(10^5, 1), probability = TRUE) 
 
 Type:                             Probability estimation 
-Number of trees:                  500 
-Sample size:                      25367 
+Number of trees:                  100 
+Sample size:                      177575 
 Number of independent variables:  8 
 Mtry:                             4 
 Target node size:                 10 
 Variable importance mode:         impurity 
 Splitrule:                        gini 
-OOB prediction error (Brier s.):  0.1088396 </code></pre>
+OOB prediction error (Brier s.):  0.1087822 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(best, data)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -554,7 +542,7 @@ OOB prediction error (Brier s.):  0.1088396 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>.pred_class
 Not_Diabetic     Diabetic 
-      253606           74 </code></pre>
+      253680            0 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>  prevalent_class <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">which.max</span>(class_table))</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  </span>
