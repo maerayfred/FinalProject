@@ -32,8 +32,7 @@ library(rpart.plot)
 library(caret)
 ```
 
-
-## Setting up Data
+## Reading in Data and Converting Variables.
 
 ```{r}
 
@@ -66,133 +65,222 @@ data<- data|>
          NoDocbcCost=factor(NoDocbcCost,levels=c(0,1),labels=c("Cost_Issue","Cost_Not_Issue")),
          DiffWalk=factor(DiffWalk,levels=c(0,1),labels=c("No_Difficulty_Walking","Difficulty_Walking"))
          )
+```
 
+## Creating Training Data
 
+On this modeling page, I will utilize the same dataset explored on the EDA page to fit a Classification Tree and a Random Forest model. The data will be split into two subsets: 70% for training and 30% for testing. Additionally, I will implement 5-fold cross-validation on the training dataset. This cross-validation procedure partitions the training data into five subsets, where each subset is used as a validation set once while the remaining subsets are used for training. This approach ensures robust resampling and improves the reliability of our model evaluation.
+
+```{r}
 set.seed(1234)
 
 split_data<-initial_split(data,prop=0.7,strata = Diabetes_binary)
 train_data<-training(split_data)
 test_data<-testing(split_data)
 cv_fold_data<-vfold_cv(train_data,v=5,strata=Diabetes_binary)
+
 ```
 
+## Classification Tree Model
 
-## Random Forest Model
+In this section, I will train a Classification Tree model. This model predicts a binary outcome—whether an individual has diabetes—based on predictor variables such as general health, diet, exercise, gender, and health insurance. The algorithm identifies the optimal root node and leaf nodes by learning patterns within the predictor variables that map to the correct output labels. It achieves this while minimizing a loss function that quantifies prediction errors. Classification Trees are particularly advantageous because they do not rely on strict assumptions about the data, such as normality or constant variance, making them flexible for various datasets. Additionally, their structure is straightforward and easy to interpret, enhancing their utility in practical applications.
 
 ```{r}
+set.seed(1234)
 data2<-data|>
   select(Sex,Veggies,AnyHealthcare,GenHlth,PhysActivity)
 
-
+# Creating a recipe 
 rec1<-recipe(Diabetes_binary~Sex+Veggies+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
    step_dummy(Sex,Veggies,GenHlth,AnyHealthcare,PhysActivity)
-
-
-
-rf_spec<-rand_forest(mtry=tune(),trees = 100)|>
-  set_engine("ranger", importance = "impurity")|>
-  set_mode("classification")
-
-rf_wkf<-workflow()|>
-  add_recipe(rec1)|>
-  add_model(rf_spec)
-
-mtry_vals <- grid_regular(mtry(range = c(1, ncol(data2) - 1)), levels = 5)
-
-rf_fit<-rf_wkf|>
-  tune_grid(resamples=cv_fold_data,
-            grid=mtry_vals,
-            metrics=metric_set(mn_log_loss))
-
-rf_fit|>
-  collect_metrics()|>
-  filter(.metric=="mn_log_loss")|>
-  arrange(mean)
-
-
-rf_best_params<-select_best(rf_fit,metric = "mn_log_loss")
-rf_best_params
-
-
-rf_final_wkf<-rf_wkf|>
-  finalize_workflow(rf_best_params)
-
-rf_final_fit<-rf_final_wkf|>
-  last_fit(split_data,metrics=metric_set(mn_log_loss))
-
-rf_final_fit|>collect_metrics()
-
-rf_model <- extract_fit_parsnip(rf_final_fit)
-importance <- ranger::importance(rf_model$fit)
-coef_table <- tibble(
-  variable = names(importance),
-  importance = importance)|>
-  arrange(desc(importance))
-print(coef_table)
-
-
 ```
 
-
-
-## Classification Tree
 ```{r}
+#Creating a decision tree allowing for multiple depths with a minimum of 5 trees. 
 tree_mod<-decision_tree(tree_depth = tune(),
                         min_n = 5,
                         cost_complexity = tune()
                         )|>
   set_engine("rpart")|>
   set_mode("classification")
+```
 
+```{r}
+#Creating the workflow that uses the model and recipe set above. 
 tree_wkf<-workflow()|>
   add_recipe(rec1)|>
   add_model(tree_mod)
+```
 
+```{r}
+#Training the model with the cross validation data set using a log loss metric.
 temp<-tree_wkf|>
   tune_grid(resamples = cv_fold_data,metrics = metric_set(mn_log_loss))
   temp|>
     collect_metrics()
+```
 
-  
-  
+```{r}
   tree_grid<-grid_regular(cost_complexity(),
                           tree_depth(),
                           levels=c(5,5))
+```
+
+```{r}
   tree_fits<-tree_wkf|>
     tune_grid(resamples=cv_fold_data,metrics=metric_set(mn_log_loss),
               grid=tree_grid)
-  
-  tree_fits
-  
+```
+
+```{r}
+#Listing out the the results 
   tree_fits|>
     collect_metrics()|>
     filter(.metric=="mn_log_loss")|>
     arrange(mean)
+```
 
-  
+```{r}
+#Selecting the Best Model
 tree_best_params<-select_best(tree_fits, metric="mn_log_loss")
 tree_best_params
+```
 
+```{r}
+# Refitting the workflow 
 tree_final_wkf<-tree_wkf|>
   finalize_workflow(tree_best_params)
+```
 
+```{r}
+# Finding the best fit.
 tree_final_fit<-tree_final_wkf|>
   last_fit(split_data,metrics=metric_set(mn_log_loss))
 tree_final_fit
+```
 
+```{r}
+# Finding the best model 
 tree_final_fit|>
   collect_metrics()
+```
 
+```{r}
+#Extracting the model.
 tree_final_model<-extract_workflow(tree_final_fit)
 tree_final_model
+```
 
+```{r}
+# Here we can see the decision tree. 
 tree_final_model %>%
   extract_fit_engine () %>%
   rpart.plot::rpart.plot(roundint=FALSE)
 
-
-
 ```
+
+## Random Forest Model
+
+In this section, we will train a Random Forest model, an ensemble learning method that combines multiple randomized decision trees to produce robust predictions. The model leverages bootstrapping, a resampling technique with replacement, to generate diverse training subsets, enhancing the model's robustness. Additionally, during tree construction, the algorithm randomly selects a subset of predictor variables for each split, reducing correlation among the trees and improving predictive accuracy. The final prediction is determined by aggregating the votes from all individual decision trees, with the majority vote dictating the predicted class label.
+
+```{r}
+
+data2<-data|>
+  select(Sex,Veggies,AnyHealthcare,GenHlth,PhysActivity)
+
+# Creating a recipe 
+rec1<-recipe(Diabetes_binary~Sex+Veggies+AnyHealthcare+GenHlth+PhysActivity,data=train_data)|>
+   step_dummy(Sex,Veggies,GenHlth,AnyHealthcare,PhysActivity)
+```
+
+```{r}
+# Creating a Random Forest Model with 100 trees. 
+rf_spec<-rand_forest(mtry=tune(),trees = 100)|>
+  set_engine("ranger", importance = "impurity")|>
+  set_mode("classification")
+```
+
+```{r}
+#Creating the workflow based on the recipe and model from above. 
+rf_wkf<-workflow()|>
+  add_recipe(rec1)|>
+  add_model(rf_spec)
+```
+
+```{r}
+#Creating predictors that the model will use base on how many predictors my model has. 
+mtry_vals <- grid_regular(mtry(range = c(1, ncol(data2) - 1)), levels = 5)
+```
+
+```{r}
+#Training the model with the cross validation data set using a log loss metric.
+rf_fit<-rf_wkf|>
+  tune_grid(resamples=cv_fold_data,
+            grid=mtry_vals,
+            metrics=metric_set(mn_log_loss))
+```
+
+```{r}
+#Looking at the different models that have different number of predictor variables and their log loss metric. 
+rf_fit|>
+  collect_metrics()|>
+  filter(.metric=="mn_log_loss")|>
+  arrange(mean)
+```
+
+```{r}
+# Selection the best model.
+rf_best_params<-select_best(rf_fit,metric = "mn_log_loss")
+rf_best_params
+```
+
+```{r}
+# Finalizing the work flow with the best model.
+rf_final_wkf<-rf_wkf|>
+  finalize_workflow(rf_best_params)
+```
+
+```{r}
+#Refitting the model 
+rf_final_fit<-rf_final_wkf|>
+  last_fit(split_data,metrics=metric_set(mn_log_loss))
+```
+
+```{r}
+#Finding the best model
+rf_final_fit|>collect_metrics()
+```
+
+```{r}
+rf_model <- extract_fit_parsnip(rf_final_fit)
+```
+
+```{r}
+importance <- ranger::importance(rf_model$fit)
+```
+
+```{r}
+coef_table <- tibble(
+  variable = names(importance),
+  importance = importance)|>
+  arrange(desc(importance))
+print(coef_table)
+```
+
+## Log Loss Metric for Decision Tree
+
+```{r}
+tree_final_fit|>
+  collect_metrics()
+```
+
+## Log Loss Metric for Random Forest
+
+```{r}
+rf_final_fit|>
+  collect_metrics()
+```
+
 ## Final and Best Model
 
 ```{r}
@@ -200,18 +288,25 @@ best<-rf_wkf|>
   finalize_workflow(rf_best_params)|>
   fit(train_data)
 best
+```
 
-predictions <- predict(best, data)
+## Determining how people the best model with the original data set would predict to be diabetic and not.
 
+```{r}
+predictions <- predict(best, data2)
+
+```
+
+```{r}
   class_table <- table(predictions)
   
   class_table
+```
+
+```{r}
 
   prevalent_class <- names(which.max(class_table))
   
-  # Return the result as a JSON response
+
   list(predicted_class = prevalent_class)
 ```
-
-
-

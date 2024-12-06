@@ -3,18 +3,14 @@ title: "EDA"
 format: html
 editor: visual
 ---
-## Introduction to the data and my Analysis
 
+## Introduction to the data and my Analysis
 
 This data set,originally a CSV file, containing cleaned data from approximately 250,000 individuals. It includes 21 variables derived directly from respondents or calculated based on their responses. The data was collected through a phone survey focused on Behavioral Risk Factors.
 
 The primary goal of this data collection and subsequent analysis is to identify the most common predictors for determining whether an individual is more likely to report having diabetes. Key variables of interest include:
 
--Sex (Gender): The respondent's reported gender.
--Veggies: Whether the respondent consumes vegetables one or more times per day.
--AnyHealthcare: Whether the respondent has any form of health insurance coverage.
--GenHealth: A self-reported health status on a scale from 1 (excellent) to 5 (poor).
--PhysActivity: Whether the respondent engaged in physical activity (excluding work-related activity) within the past 30 days.
+-Sex (Gender): The respondent's reported gender. -Veggies: Whether the respondent consumes vegetables one or more times per day. -AnyHealthcare: Whether the respondent has any form of health insurance coverage. -GenHealth: A self-reported health status on a scale from 1 (excellent) to 5 (poor). -PhysActivity: Whether the respondent engaged in physical activity (excluding work-related activity) within the past 30 days.
 
 The purpose of the exploratory data analysis (EDA) is to ensure the data is clean, prepare it for analysis (e.g., converting numeric responses into meaningful categories for better interpretation), and examine the prevalence of these potential risk factors.
 
@@ -23,6 +19,7 @@ The purpose of the exploratory data analysis (EDA) is to ensure the data is clea
 ```{r}
 library(tidyverse)
 library(tidyr)
+set.seed(1234)
 
 data<-read.csv("diabetes_binary_health_indicators_BRFSS2015.csv")
 
@@ -58,9 +55,10 @@ data<- data|>
 str(data)
 ```
 
-## Confirming the data doesn't have any missing observations. 
+## Confirming the data doesn't have any missing observations.
 
 ```{r}
+set.seed(1234)
 sum_na<-function(column){
   sum(is.na(column))
 }
@@ -71,14 +69,14 @@ na_counts<-data|>
 print(na_counts)
 ```
 
-## In this section, I aimed to explore basic descriptive statistics, including the minimum, maximum, mean, median, and spread, for the numeric variables. The variables analyzed include:
+## Summaries
 
-BMI (Body Mass Index): A measure of body weight relative to height.
-MentHlth: The number of days in the past month affected by stress, depression, or other mental health issues.
-PhysHlth: The number of days in the past month affected by physical illness or injury.
-Mental and physical well-being are critical components of overall health. In this analysis, I observed that the mean and median for both MentHlth and PhysHlth are 0, with an interquartile range (IQR) of 0. This suggests that, for the majority of respondents in this dataset, mental and physical health issues have minimal reported impact, indicating these factors may not significantly affect this surveyed group.
+In this section, I aimed to explore basic descriptive statistics, including the minimum, maximum, mean, median, and spread, for the numeric variables. The variables analyzed include:
+
+BMI (Body Mass Index): A measure of body weight relative to height. MentHlth: The number of days in the past month affected by stress, depression, or other mental health issues. PhysHlth: The number of days in the past month affected by physical illness or injury. Mental and physical well-being are critical components of overall health. In this analysis, I observed that the mean and median for both MentHlth and PhysHlth are 0, with an interquartile range (IQR) of 0. This suggests that, for the majority of respondents in this dataset, mental and physical health issues have minimal reported impact, indicating these factors may not significantly affect this surveyed group.
 
 ```{r}
+set.seed(1234)
 summaries<- data|>
   summarize(across(where(is.numeric),
                    list("mean"=mean,
@@ -92,10 +90,12 @@ print(summaries)
 
 ```
 
-## To begin, I analyzed the distribution of diabetes status by gender. While the dataset contains a higher number of women compared to men, the prevalence of diabetes appears to be similar between the two groups.
+## Graphical Summaries
+
+To begin, I analyzed the distribution of diabetes status by gender. While the dataset contains a higher number of women compared to men, the prevalence of diabetes appears to be similar between the two groups.
 
 ```{r}
-
+set.seed(1234)
 table(data$Sex,data$Diabetes_binary)
 
 
@@ -109,6 +109,7 @@ ggplot(data=data,aes(x=Sex,fill=Diabetes_binary))+
 ```
 
 ## Pie Chart
+
 I analyzed the relationship between individuals' self-reported general health levels and their diabetes status. My initial hunch was that individuals reporting excellent health would have lower rates of diabetes, while those reporting poor health would exhibit the highest rates. Given that the average diabetes prevalence in the United States is approximately 20%, I anticipated this trend to hold across the dataset.
 
 Upon examining the data, an interesting pattern emerged: individuals reporting "Good" and "Fair" general health had unexpectedly higher rates of diabetes, while those reporting "Poor" health had lower-than-expected rates. Specifically, a pie chart visualization revealed that approximately 38.1% of individuals reporting "Good" general health had diabetes, followed by 27.7% of those reporting "Fair" health. In contrast, only 13% of individuals who reported "Poor" general health were diabetic.
@@ -117,7 +118,7 @@ Upon examining the data, an interesting pattern emerged: individuals reporting "
 
 library(ggplot2)
 library(dplyr)
-
+set.seed(1234)
 #Table with counts of reported general health 
 table(data$GenHlth,data$Diabetes_binary)
 
@@ -143,11 +144,12 @@ ggplot(health_status_percent, aes(x = "", y = Percentage, fill = GenHlth)) +
 
 ```
 
+## BoxPlots
 
-
-## Next, I explored the relationship between lifestyle factors, specifically daily vegetable consumption and physical activity, and their association with elevated BMI and the prevalence of diabetes. I focused on these behaviors rather than metrics such as high cholesterol or blood pressure, as my interest was in examining individual habits rather than physiological indicators. The analysis revealed that among participants with diabetes who reported not consuming vegetables daily, approximately 75% had a BMI exceeding the median BMI of those who consumed vegetables daily and were not diabetic.
+Next, I explored the relationship between lifestyle factors, specifically daily vegetable consumption and physical activity, and their association with elevated BMI and the prevalence of diabetes. I focused on these behaviors rather than metrics such as high cholesterol or blood pressure, as my interest was in examining individual habits rather than physiological indicators. The analysis revealed that among participants with diabetes who reported not consuming vegetables daily, approximately 75% had a BMI exceeding the median BMI of those who consumed vegetables daily and were not diabetic.
 
 ```{r}
+set.seed(1234)
 # Create a grouped boxplot using ggplot2
 ggplot(data = data, aes(x = Veggies, y = BMI,
                         fill = factor(Diabetes_binary))) +
@@ -159,6 +161,7 @@ ggplot(data = data, aes(x = Veggies, y = BMI,
 ## A similar trend is observed with physical activity as with vegetable consumption.
 
 ```{r}
+set.seed(1234)
 ggplot(data = data, aes(x = PhysActivity, y = BMI,
                         fill = factor(Diabetes_binary))) +
   geom_boxplot() +
@@ -166,10 +169,6 @@ ggplot(data = data, aes(x = PhysActivity, y = BMI,
   labs(fill = "Diabetes Status")
 ```
 
-
-
-
-
 ## Having examined the predictor variables I consider most significant, I will now incorporate them into a classification tree and random forest model. Click the link below to explore this analysis further
 
-Navigate to the [Modeling Page](modeling.html) for more details about the modeling
+Navigate to the [Modeling Page](Modeling.html) for more details about the modeling
